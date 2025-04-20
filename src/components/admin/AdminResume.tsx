@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Upload, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -7,10 +7,19 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 const AdminResume = () => {
   const [currentResume, setCurrentResume] = useState<File | null>(null);
+  const [resumeName, setResumeName] = useState<string | null>(null);
   const [uploading, setUploading] = useState<boolean>(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  // Load saved resume name from localStorage
+  useEffect(() => {
+    const savedResumeName = localStorage.getItem('resumeName');
+    if (savedResumeName) {
+      setResumeName(savedResumeName);
+    }
+  }, []);
 
   const handleResumeUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -23,6 +32,12 @@ const AdminResume = () => {
         // Simulate upload process
         setTimeout(() => {
           setCurrentResume(file);
+          setResumeName(file.name);
+          localStorage.setItem('resumeName', file.name);
+          
+          // Store basic info about the file in localStorage
+          // We can't store the actual file in localStorage
+          localStorage.setItem('resumeLastUpdated', new Date().toISOString());
           setUploading(false);
           
           toast({
@@ -54,6 +69,9 @@ const AdminResume = () => {
         // Simulate upload process
         setTimeout(() => {
           setCurrentResume(file);
+          setResumeName(file.name);
+          localStorage.setItem('resumeName', file.name);
+          localStorage.setItem('resumeLastUpdated', new Date().toISOString());
           setUploading(false);
           
           toast({
@@ -81,6 +99,14 @@ const AdminResume = () => {
     fileInputRef.current?.click();
   };
 
+  const viewResume = () => {
+    // In a real app, this would open the resume from a storage service
+    toast({
+      title: "View Resume",
+      description: "Opening resume viewer...",
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -92,12 +118,17 @@ const AdminResume = () => {
           <div>
             <h3 className="text-lg font-medium text-white mb-2">Current Resume</h3>
             <p className="text-white/70 text-sm">
-              {currentResume ? currentResume.name : "No resume uploaded"}
+              {resumeName ? resumeName : "No resume uploaded"}
             </p>
+            {resumeName && (
+              <p className="text-white/50 text-xs mt-1">
+                Last updated: {new Date(localStorage.getItem('resumeLastUpdated') || '').toLocaleDateString()}
+              </p>
+            )}
           </div>
           
-          {currentResume && (
-            <Button variant="outline" className="gap-2">
+          {resumeName && (
+            <Button variant="outline" className="gap-2" onClick={viewResume}>
               <FileText className="h-4 w-4" />
               View Current
             </Button>

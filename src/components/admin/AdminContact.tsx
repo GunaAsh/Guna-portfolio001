@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Mail, Phone, MapPin, Linkedin, Github, Twitter, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -23,17 +23,44 @@ const AdminContact = () => {
     github: 'https://github.com/neurospark',
     twitter: 'https://twitter.com/neurospark',
   });
+
+  const [formSettings, setFormSettings] = useState({
+    emailNotifications: true,
+    showForm: true,
+    autoResponse: "Thank you for contacting me. I'll get back to you as soon as possible!"
+  });
+  
+  // Load data from localStorage on component mount
+  useEffect(() => {
+    const savedContactInfo = localStorage.getItem('contactInfo');
+    if (savedContactInfo) {
+      setContactInfo(JSON.parse(savedContactInfo));
+    }
+
+    const savedFormSettings = localStorage.getItem('contactFormSettings');
+    if (savedFormSettings) {
+      setFormSettings(JSON.parse(savedFormSettings));
+    }
+  }, []);
   
   const handleInputChange = (field: keyof ContactInfo, value: string) => {
     setContactInfo({...contactInfo, [field]: value});
   };
   
   const handleSave = () => {
-    // In a real app, you'd save this to a database or API
+    // Save to localStorage
+    localStorage.setItem('contactInfo', JSON.stringify(contactInfo));
+    
     toast({
       title: "Contact Information Updated",
       description: "Your contact details have been successfully saved",
     });
+  };
+
+  const handleFormSettingChange = (setting: string, value: any) => {
+    const newSettings = { ...formSettings, [setting]: value };
+    setFormSettings(newSettings);
+    localStorage.setItem('contactFormSettings', JSON.stringify(newSettings));
   };
   
   return (
@@ -161,7 +188,8 @@ const AdminContact = () => {
             <input 
               type="checkbox" 
               className="rounded text-neurospark-purple"
-              defaultChecked 
+              checked={formSettings.emailNotifications}
+              onChange={(e) => handleFormSettingChange('emailNotifications', e.target.checked)}
             />
             <span className="text-white/70">Email me when someone submits the contact form</span>
           </label>
@@ -172,7 +200,8 @@ const AdminContact = () => {
             <input 
               type="checkbox" 
               className="rounded text-neurospark-purple"
-              defaultChecked 
+              checked={formSettings.showForm}
+              onChange={(e) => handleFormSettingChange('showForm', e.target.checked)}
             />
             <span className="text-white/70">Show form on contact page</span>
           </label>
@@ -182,7 +211,8 @@ const AdminContact = () => {
           <label className="block text-white/70 mb-1 text-sm">Auto-Response Message</label>
           <textarea 
             className="w-full h-24 rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:text-sm"
-            defaultValue="Thank you for contacting me. I'll get back to you as soon as possible!"
+            value={formSettings.autoResponse}
+            onChange={(e) => handleFormSettingChange('autoResponse', e.target.value)}
           />
         </div>
       </div>

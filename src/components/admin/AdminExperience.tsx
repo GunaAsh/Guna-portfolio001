@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, Code, Briefcase, GraduationCap, Edit, Trash2, Save, X, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -14,40 +13,7 @@ interface TimelineItem {
 
 const AdminExperience = () => {
   const { toast } = useToast();
-  const [timelineItems, setTimelineItems] = useState<TimelineItem[]>([
-    {
-      id: 1,
-      year: '2023 - Present',
-      title: 'Founder & AI Consultant',
-      company: 'NeuroSpark',
-      description: 'Leading AI consulting firm specializing in computer vision and natural language processing solutions.',
-      icon: 'briefcase',
-    },
-    {
-      id: 2,
-      year: '2021 - 2023',
-      title: 'Senior Machine Learning Engineer',
-      company: 'Tech Innovators Inc.',
-      description: 'Led multiple AI initiatives, developed predictive models, and implemented computer vision solutions.',
-      icon: 'code',
-    },
-    {
-      id: 3,
-      year: '2019 - 2021',
-      title: 'Data Scientist',
-      company: 'DataWave Analytics',
-      description: 'Built machine learning models for predictive analytics and natural language processing applications.',
-      icon: 'calendar',
-    },
-    {
-      id: 4,
-      year: '2018',
-      title: 'MSc in Artificial Intelligence',
-      company: 'Tech University',
-      description: 'Graduate studies focused on deep learning, computer vision, and reinforcement learning.',
-      icon: 'graduation',
-    },
-  ]);
+  const [timelineItems, setTimelineItems] = useState<TimelineItem[]>([]);
 
   const [isEditing, setIsEditing] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
@@ -61,6 +27,51 @@ const AdminExperience = () => {
     icon: 'briefcase'
   });
 
+  // Load timeline items from localStorage
+  useEffect(() => {
+    const savedTimelineItems = localStorage.getItem('experienceItems');
+    if (savedTimelineItems) {
+      setTimelineItems(JSON.parse(savedTimelineItems));
+    } else {
+      // Default timeline items if none saved
+      const defaultItems = [
+        {
+          id: 1,
+          year: '2023 - Present',
+          title: 'Founder & AI Consultant',
+          company: 'NeuroSpark',
+          description: 'Leading AI consulting firm specializing in computer vision and natural language processing solutions.',
+          icon: 'briefcase' as const,
+        },
+        {
+          id: 2,
+          year: '2021 - 2023',
+          title: 'Senior Machine Learning Engineer',
+          company: 'Tech Innovators Inc.',
+          description: 'Led multiple AI initiatives, developed predictive models, and implemented computer vision solutions.',
+          icon: 'code' as const,
+        },
+        {
+          id: 3,
+          year: '2019 - 2021',
+          title: 'Data Scientist',
+          company: 'DataWave Analytics',
+          description: 'Built machine learning models for predictive analytics and natural language processing applications.',
+          icon: 'calendar' as const,
+        },
+        {
+          id: 4,
+          year: '2018',
+          title: 'MSc in Artificial Intelligence',
+          company: 'Tech University',
+          description: 'Graduate studies focused on deep learning, computer vision, and reinforcement learning.',
+          icon: 'graduation' as const,
+        },
+      ];
+      setTimelineItems(defaultItems);
+    }
+  }, []);
+
   // Edit timeline item
   const handleEdit = (item: TimelineItem) => {
     setCurrentItem(item);
@@ -72,7 +83,10 @@ const AdminExperience = () => {
   // Delete timeline item
   const handleDelete = (id: number) => {
     if (confirm("Are you sure you want to delete this experience item?")) {
-      setTimelineItems(timelineItems.filter(item => item.id !== id));
+      const updatedItems = timelineItems.filter(item => item.id !== id);
+      setTimelineItems(updatedItems);
+      localStorage.setItem('experienceItems', JSON.stringify(updatedItems));
+      
       toast({
         title: "Item Deleted",
         description: "The experience item has been successfully deleted",
@@ -106,16 +120,24 @@ const AdminExperience = () => {
       return;
     }
 
+    let updatedItems: TimelineItem[];
+    
     if (isEditing && currentItem) {
       // Update existing item
-      setTimelineItems(timelineItems.map(item => item.id === currentItem.id ? formValues : item));
+      updatedItems = timelineItems.map(item => item.id === currentItem.id ? formValues : item);
+      setTimelineItems(updatedItems);
+      localStorage.setItem('experienceItems', JSON.stringify(updatedItems));
+      
       toast({
         title: "Experience Updated",
         description: "The experience item has been successfully updated",
       });
     } else if (isAdding) {
       // Add new item
-      setTimelineItems([...timelineItems, formValues]);
+      updatedItems = [...timelineItems, formValues];
+      setTimelineItems(updatedItems);
+      localStorage.setItem('experienceItems', JSON.stringify(updatedItems));
+      
       toast({
         title: "Experience Added",
         description: "The new experience item has been successfully added",

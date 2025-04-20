@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Plus, Edit, Trash2, ExternalLink, Github, Save, X 
 } from 'lucide-react';
@@ -21,59 +20,7 @@ interface Project {
 
 const AdminProjects = () => {
   const { toast } = useToast();
-  const [projects, setProjects] = useState<Project[]>([
-    {
-      id: 1,
-      title: "AI Visual Recognition System",
-      description: "Computer vision application that identifies objects and people in real-time video feeds.",
-      longDescription: "A comprehensive visual recognition system that leverages YOLOv8 and custom neural networks to identify objects, people, and activities in real-time video streams.",
-      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&q=80",
-      tags: ["Computer Vision", "YOLOv8", "PyTorch"],
-      techStack: ["Python", "PyTorch", "YOLOv8", "OpenCV", "TensorFlow", "Flask"],
-      githubUrl: "https://github.com",
-      liveUrl: "https://demo.com",
-      problem: "Traditional surveillance systems require constant human monitoring, making them inefficient for large-scale deployments and prone to human error.",
-      solution: "Implemented a custom YOLOv8 model fine-tuned on industry-specific data, achieving 97% accuracy. The system processes video feeds in real-time and sends alerts based on detected anomalies."
-    },
-    {
-      id: 2,
-      title: "Natural Language Financial Advisor",
-      description: "AI-powered chatbot that provides personalized financial advice based on user data.",
-      longDescription: "An intelligent virtual assistant that analyzes user financial data and market trends to provide actionable investment advice and financial planning recommendations.",
-      image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80",
-      tags: ["NLP", "Financial AI", "Machine Learning"],
-      techStack: ["Python", "TensorFlow", "BERT", "Flask", "React", "PostgreSQL"],
-      githubUrl: "https://github.com",
-      problem: "Financial advice is often expensive and inaccessible to average consumers, while generic advice isn't tailored to individual circumstances.",
-      solution: "Built a BERT-based NLP system that understands financial queries and generates personalized advice based on the user's financial profile, historical data, and market conditions."
-    },
-    {
-      id: 3,
-      title: "Predictive Healthcare Analytics",
-      description: "Machine learning system that predicts patient outcomes based on medical history and symptoms.",
-      longDescription: "A comprehensive healthcare analytics platform that uses patient data and medical research to predict health outcomes and suggest preventive measures.",
-      image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&q=80",
-      tags: ["Healthcare", "Predictive Analytics", "ML"],
-      techStack: ["Python", "TensorFlow", "scikit-learn", "Django", "React", "MongoDB"],
-      githubUrl: "https://github.com",
-      liveUrl: "https://demo.com",
-      problem: "Healthcare providers struggle to identify high-risk patients early enough for preventive intervention, leading to poorer outcomes and higher costs.",
-      solution: "Developed a predictive model that analyzes patient medical history, demographic data, and clinical parameters to identify high-risk individuals with 89% accuracy, enabling early intervention."
-    },
-    {
-      id: 4,
-      title: "Smart Energy Management System",
-      description: "IoT platform that optimizes energy consumption in commercial buildings using AI.",
-      longDescription: "An intelligent energy management system that integrates with IoT sensors to monitor and optimize energy usage in real-time across commercial and residential buildings.",
-      image: "https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&q=80",
-      tags: ["IoT", "Energy", "Reinforcement Learning"],
-      techStack: ["Python", "TensorFlow", "Raspberry Pi", "MQTT", "React", "Time-series DB"],
-      githubUrl: "https://github.com",
-      problem: "Commercial buildings waste significant energy through inefficient HVAC and lighting operations that don't adapt to changing conditions or occupancy patterns.",
-      solution: "Created a reinforcement learning system that continuously optimizes HVAC and lighting settings based on occupancy, external weather, and historical patterns, resulting in 23% energy savings."
-    },
-  ]);
-
+  const [projects, setProjects] = useState<Project[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
@@ -91,6 +38,69 @@ const AdminProjects = () => {
     solution: ""
   });
 
+  // Load projects from localStorage on component mount
+  useEffect(() => {
+    const savedProjects = localStorage.getItem('projects');
+    if (savedProjects) {
+      setProjects(JSON.parse(savedProjects));
+    } else {
+      // Set default projects if none in localStorage
+      const defaultProjects = [
+        {
+          id: 1,
+          title: "AI Visual Recognition System",
+          description: "Computer vision application that identifies objects and people in real-time video feeds.",
+          longDescription: "A comprehensive visual recognition system that leverages YOLOv8 and custom neural networks to identify objects, people, and activities in real-time video streams.",
+          image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&q=80",
+          tags: ["Computer Vision", "YOLOv8", "PyTorch"],
+          techStack: ["Python", "PyTorch", "YOLOv8", "OpenCV", "TensorFlow", "Flask"],
+          githubUrl: "https://github.com",
+          liveUrl: "https://demo.com",
+          problem: "Traditional surveillance systems require constant human monitoring, making them inefficient for large-scale deployments and prone to human error.",
+          solution: "Implemented a custom YOLOv8 model fine-tuned on industry-specific data, achieving 97% accuracy. The system processes video feeds in real-time and sends alerts based on detected anomalies."
+        },
+        {
+          id: 2,
+          title: "Natural Language Financial Advisor",
+          description: "AI-powered chatbot that provides personalized financial advice based on user data.",
+          longDescription: "An intelligent virtual assistant that analyzes user financial data and market trends to provide actionable investment advice and financial planning recommendations.",
+          image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80",
+          tags: ["NLP", "Financial AI", "Machine Learning"],
+          techStack: ["Python", "TensorFlow", "BERT", "Flask", "React", "PostgreSQL"],
+          githubUrl: "https://github.com",
+          problem: "Financial advice is often expensive and inaccessible to average consumers, while generic advice isn't tailored to individual circumstances.",
+          solution: "Built a BERT-based NLP system that understands financial queries and generates personalized advice based on the user's financial profile, historical data, and market conditions."
+        },
+        {
+          id: 3,
+          title: "Predictive Healthcare Analytics",
+          description: "Machine learning system that predicts patient outcomes based on medical history and symptoms.",
+          longDescription: "A comprehensive healthcare analytics platform that uses patient data and medical research to predict health outcomes and suggest preventive measures.",
+          image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&q=80",
+          tags: ["Healthcare", "Predictive Analytics", "ML"],
+          techStack: ["Python", "TensorFlow", "scikit-learn", "Django", "React", "MongoDB"],
+          githubUrl: "https://github.com",
+          liveUrl: "https://demo.com",
+          problem: "Healthcare providers struggle to identify high-risk patients early enough for preventive intervention, leading to poorer outcomes and higher costs.",
+          solution: "Developed a predictive model that analyzes patient medical history, demographic data, and clinical parameters to identify high-risk individuals with 89% accuracy, enabling early intervention."
+        },
+        {
+          id: 4,
+          title: "Smart Energy Management System",
+          description: "IoT platform that optimizes energy consumption in commercial buildings using AI.",
+          longDescription: "An intelligent energy management system that integrates with IoT sensors to monitor and optimize energy usage in real-time across commercial and residential buildings.",
+          image: "https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&q=80",
+          tags: ["IoT", "Energy", "Reinforcement Learning"],
+          techStack: ["Python", "TensorFlow", "Raspberry Pi", "MQTT", "React", "Time-series DB"],
+          githubUrl: "https://github.com",
+          problem: "Commercial buildings waste significant energy through inefficient HVAC and lighting operations that don't adapt to changing conditions or occupancy patterns.",
+          solution: "Created a reinforcement learning system that continuously optimizes HVAC and lighting settings based on occupancy, external weather, and historical patterns, resulting in 23% energy savings."
+        },
+      ];
+      setProjects(defaultProjects);
+    }
+  }, []);
+
   // Edit project
   const handleEdit = (project: Project) => {
     setCurrentProject(project);
@@ -102,7 +112,10 @@ const AdminProjects = () => {
   // Delete project
   const handleDelete = (id: number) => {
     if (confirm("Are you sure you want to delete this project?")) {
-      setProjects(projects.filter(project => project.id !== id));
+      const updatedProjects = projects.filter(project => project.id !== id);
+      setProjects(updatedProjects);
+      localStorage.setItem('projects', JSON.stringify(updatedProjects));
+      
       toast({
         title: "Project Deleted",
         description: "The project has been successfully deleted",
@@ -141,16 +154,24 @@ const AdminProjects = () => {
       return;
     }
 
+    let updatedProjects: Project[];
+    
     if (isEditing && currentProject) {
       // Update existing project
-      setProjects(projects.map(p => p.id === currentProject.id ? formValues : p));
+      updatedProjects = projects.map(p => p.id === currentProject.id ? formValues : p);
+      setProjects(updatedProjects);
+      localStorage.setItem('projects', JSON.stringify(updatedProjects));
+      
       toast({
         title: "Project Updated",
         description: "The project has been successfully updated",
       });
     } else if (isAdding) {
       // Add new project
-      setProjects([...projects, formValues]);
+      updatedProjects = [...projects, formValues];
+      setProjects(updatedProjects);
+      localStorage.setItem('projects', JSON.stringify(updatedProjects));
+      
       toast({
         title: "Project Added",
         description: "The new project has been successfully added",
@@ -179,6 +200,7 @@ const AdminProjects = () => {
     setCurrentProject(null);
   };
 
+  
   return (
     <div>
       <div className="flex justify-between items-center mb-8">

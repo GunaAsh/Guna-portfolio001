@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Save, Plus, Trash2, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -11,28 +11,45 @@ interface TechItem {
 const AdminAbout = () => {
   const { toast } = useToast();
   
-  const [bio, setBio] = useState<string>(
-    "I'm a passionate AI/ML Developer and Freelance Project Consultant with expertise in building innovative solutions for complex problems. With over 5 years of experience in machine learning, computer vision, and natural language processing, I specialize in turning data into actionable insights and intelligent applications.\n\nAs the founder of NeuroSpark, I work with clients ranging from startups to enterprises, helping them leverage artificial intelligence to gain competitive advantages. My approach combines technical expertise with a deep understanding of business needs to create scalable, effective solutions."
-  );
-  
-  const [techStack, setTechStack] = useState<TechItem[]>([
-    { name: 'Python', icon: '🐍' },
-    { name: 'TensorFlow', icon: '🧠' },
-    { name: 'PyTorch', icon: '🔥' },
-    { name: 'OpenCV', icon: '👁️' },
-    { name: 'Flask', icon: '🌐' },
-    { name: 'React', icon: '⚛️' },
-    { name: 'YOLOv8', icon: '📷' },
-    { name: 'Docker', icon: '🐳' },
-    { name: 'AWS', icon: '☁️' },
-    { name: 'MongoDB', icon: '🍃' },
-  ]);
-  
+  const [bio, setBio] = useState<string>('');
+  const [techStack, setTechStack] = useState<TechItem[]>([]);
   const [newTechName, setNewTechName] = useState('');
   const [newTechIcon, setNewTechIcon] = useState('');
   const [showAddTech, setShowAddTech] = useState(false);
   
+  // Load data from localStorage on component mount
+  useEffect(() => {
+    const savedBio = localStorage.getItem('aboutBio');
+    if (savedBio) {
+      setBio(savedBio);
+    } else {
+      setBio(
+        "I'm a passionate AI/ML Developer and Freelance Project Consultant with expertise in building innovative solutions for complex problems. With over 5 years of experience in machine learning, computer vision, and natural language processing, I specialize in turning data into actionable insights and intelligent applications.\n\nAs the founder of NeuroSpark, I work with clients ranging from startups to enterprises, helping them leverage artificial intelligence to gain competitive advantages. My approach combines technical expertise with a deep understanding of business needs to create scalable, effective solutions."
+      );
+    }
+    
+    const savedTechStack = localStorage.getItem('aboutTechStack');
+    if (savedTechStack) {
+      setTechStack(JSON.parse(savedTechStack));
+    } else {
+      setTechStack([
+        { name: 'Python', icon: '🐍' },
+        { name: 'TensorFlow', icon: '🧠' },
+        { name: 'PyTorch', icon: '🔥' },
+        { name: 'OpenCV', icon: '👁️' },
+        { name: 'Flask', icon: '🌐' },
+        { name: 'React', icon: '⚛️' },
+        { name: 'YOLOv8', icon: '📷' },
+        { name: 'Docker', icon: '🐳' },
+        { name: 'AWS', icon: '☁️' },
+        { name: 'MongoDB', icon: '🍃' },
+      ]);
+    }
+  }, []);
+  
   const handleSaveBio = () => {
+    localStorage.setItem('aboutBio', bio);
+    
     toast({
       title: "Bio Updated",
       description: "Your bio has been successfully updated",
@@ -49,7 +66,10 @@ const AdminAbout = () => {
       return;
     }
     
-    setTechStack([...techStack, { name: newTechName, icon: newTechIcon }]);
+    const updatedTechStack = [...techStack, { name: newTechName, icon: newTechIcon }];
+    setTechStack(updatedTechStack);
+    localStorage.setItem('aboutTechStack', JSON.stringify(updatedTechStack));
+    
     setNewTechName('');
     setNewTechIcon('');
     setShowAddTech(false);
@@ -64,6 +84,7 @@ const AdminAbout = () => {
     const updatedTechStack = [...techStack];
     updatedTechStack.splice(index, 1);
     setTechStack(updatedTechStack);
+    localStorage.setItem('aboutTechStack', JSON.stringify(updatedTechStack));
     
     toast({
       title: "Tech Removed",
