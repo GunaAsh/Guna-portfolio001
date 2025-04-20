@@ -1,13 +1,13 @@
-
 import React, { useEffect } from 'react';
 import { Routes, Route, NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, FileText, User, Briefcase, LogOut, Mail } from 'lucide-react';
+import { LayoutDashboard, FileText, User, Briefcase, LogOut, Mail, FileUp } from 'lucide-react';
 
 import AdminProjects from '../components/admin/AdminProjects';
 import AdminAbout from '../components/admin/AdminAbout';
 import AdminExperience from '../components/admin/AdminExperience';
 import AdminContact from '../components/admin/AdminContact';
 import AdminOverview from '../components/admin/AdminOverview';
+import AdminResume from '../components/admin/AdminResume';
 import { useToast } from '@/hooks/use-toast';
 
 const AdminDashboard = () => {
@@ -121,6 +121,20 @@ const AdminDashboard = () => {
             <Mail size={18} />
             <span>Contact</span>
           </NavLink>
+          
+          <NavLink 
+            to="/admin/dashboard/resume" 
+            className={({isActive}) => 
+              `flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+                isActive 
+                  ? 'bg-neurospark-purple/20 text-neurospark-purple-light' 
+                  : 'text-white/70 hover:bg-white/5 hover:text-white'
+              }`
+            }
+          >
+            <FileUp size={18} />
+            <span>Resume</span>
+          </NavLink>
         </nav>
         
         <div className="absolute bottom-4">
@@ -142,6 +156,7 @@ const AdminDashboard = () => {
           <Route path="/about" element={<AdminAbout />} />
           <Route path="/experience" element={<AdminExperience />} />
           <Route path="/contact" element={<AdminContact />} />
+          <Route path="/resume" element={<AdminResume />} />
         </Routes>
       </main>
     </div>

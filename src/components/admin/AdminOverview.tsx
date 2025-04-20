@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, User, Briefcase, Mail } from 'lucide-react';
+import { FileText, User, Briefcase, Mail, FileUp } from 'lucide-react';
 
 const AdminOverview = () => {
   const navigate = useNavigate();
@@ -33,6 +32,13 @@ const AdminOverview = () => {
       description: "Edit your contact information and social links",
       icon: <Mail className="h-8 w-8" />,
       path: "/admin/dashboard/contact",
+      count: 1,
+    },
+    {
+      title: "Resume",
+      description: "Upload and manage your downloadable resume",
+      icon: <FileUp className="h-8 w-8" />,
+      path: "/admin/dashboard/resume",
       count: 1,
     },
   ];
