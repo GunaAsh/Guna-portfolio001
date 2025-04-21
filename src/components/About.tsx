@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Calendar, Code, Briefcase, GraduationCap, Download } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 
 interface TechItem {
   name: string;
@@ -73,6 +74,7 @@ const About = () => {
   // Resume state
   const [resumeName, setResumeName] = useState<string | null>(null);
   const [resumeLastUpdated, setResumeLastUpdated] = useState<string | null>(null);
+  const { toast } = useToast();
 
   // Load data from localStorage on component mount
   useEffect(() => {
@@ -125,13 +127,39 @@ const About = () => {
     // Check if resume exists
     if (!resumeName) {
       e.preventDefault();
-      console.log('No resume available for download');
-      // You could add a toast notification here in a real app
+      toast({
+        title: "No resume available",
+        description: "No resume has been uploaded yet.",
+        variant: "destructive",
+      });
       return;
     }
     
     console.log('Downloading resume:', resumeName);
-    // In a real app with backend storage, this would be a real download link
+    
+    // In a real application, we would have a server endpoint to download the file
+    // For now, we'll simulate a download by creating a blob
+    const dummyContent = "This is a simulated resume download. In a real application, this would download the actual resume file.";
+    const blob = new Blob([dummyContent], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+    
+    // Create a temporary link and trigger download
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = resumeName;
+    document.body.appendChild(a);
+    a.click();
+    
+    // Clean up
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+    
+    toast({
+      title: "Resume download started",
+      description: `Downloading ${resumeName}...`,
+    });
   };
 
   return (
