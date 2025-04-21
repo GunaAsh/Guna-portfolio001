@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Calendar, Code, Briefcase, GraduationCap, Download } from 'lucide-react';
+import { Calendar, Code, Briefcase, GraduationCap, Download, Eye } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 
 interface TechItem {
@@ -76,6 +76,9 @@ const About = () => {
   const [resumeLastUpdated, setResumeLastUpdated] = useState<string | null>(null);
   const { toast } = useToast();
 
+  // Modal state for viewing resume
+  const [showResumeModal, setShowResumeModal] = useState<boolean>(false);
+
   // Load data from localStorage on component mount
   useEffect(() => {
     // Load bio
@@ -122,9 +125,9 @@ const About = () => {
         return <Briefcase className="h-5 w-5" />;
     }
   };
-  
+
+  /** Download Resume logic (simulated) **/
   const handleDownloadResume = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    // Check if resume exists
     if (!resumeName) {
       e.preventDefault();
       toast({
@@ -134,33 +137,42 @@ const About = () => {
       });
       return;
     }
-    
     console.log('Downloading resume:', resumeName);
-    
-    // In a real application, we would have a server endpoint to download the file
-    // For now, we'll simulate a download by creating a blob
     const dummyContent = "This is a simulated resume download. In a real application, this would download the actual resume file.";
     const blob = new Blob([dummyContent], { type: "application/pdf" });
     const url = URL.createObjectURL(blob);
-    
-    // Create a temporary link and trigger download
+
     const a = document.createElement("a");
     a.href = url;
     a.download = resumeName;
     document.body.appendChild(a);
     a.click();
-    
-    // Clean up
+
     setTimeout(() => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }, 100);
-    
+
     toast({
       title: "Resume download started",
       description: `Downloading ${resumeName}...`,
     });
   };
+
+  /** VIEW Resume Logic (simulated PDF preview in a modal) **/
+  const handleViewResume = () => {
+    if (!resumeName) {
+      toast({
+        title: "No resume available",
+        description: "No resume has been uploaded yet.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setShowResumeModal(true);
+  };
+
+  const closeModal = () => setShowResumeModal(false);
 
   return (
     <section id="about" className="section-container">
@@ -182,7 +194,7 @@ const About = () => {
               </p>
             )}
             
-            <div className="flex items-center mb-8">
+            <div className="flex items-center mb-8 gap-3">
               <a 
                 href="#" 
                 className={`btn-primary flex items-center gap-2 group ${!resumeName ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -191,8 +203,49 @@ const About = () => {
                 <Download className="h-5 w-5 transition-transform group-hover:-translate-y-1" />
                 {resumeName ? 'Download Resume' : 'Resume Not Available'}
               </a>
+              {/* View Resume Button (shows if resume is available) */}
+              <button
+                className={`btn-primary flex items-center gap-2 bg-blue-600 hover:bg-blue-700 transition-colors px-4 py-2 rounded ${!resumeName ? 'opacity-50 cursor-not-allowed' : ''}`}
+                type="button"
+                onClick={handleViewResume}
+                disabled={!resumeName}
+                aria-disabled={!resumeName}
+              >
+                <Eye className="h-5 w-5" />
+                View Resume
+              </button>
             </div>
           </div>
+
+          {/* VIEW RESUME MODAL */}
+          {showResumeModal && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
+              onClick={closeModal}
+            >
+              <div className="bg-neurospark-dark rounded-xl shadow-xl p-6 w-[90%] max-w-2xl relative"
+                   onClick={e => e.stopPropagation()}
+              >
+                <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <Eye className="h-5 w-5" /> {resumeName}
+                </h4>
+                {/* Simulated: Show dummy file content */}
+                <div className="w-full h-[400px] flex items-center justify-center bg-black rounded-lg text-white/70 border border-white/10">
+                  <span>
+                    This is a simulated PDF preview.<br/>
+                    In a real app, the actual PDF resume would be displayed here.
+                  </span>
+                </div>
+                <button
+                  className="absolute top-3 right-3 text-white/60 hover:text-white transition p-2"
+                  onClick={closeModal}
+                  aria-label="Close"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          )}
           
           {/* Tech stack */}
           <div>
@@ -247,3 +300,4 @@ const About = () => {
 };
 
 export default About;
+
