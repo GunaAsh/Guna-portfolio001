@@ -1,9 +1,28 @@
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Calendar, Code, Briefcase, GraduationCap, Download } from 'lucide-react';
 
+interface TechItem {
+  name: string;
+  icon: string;
+}
+
+interface TimelineItem {
+  id: number;
+  year: string;
+  title: string;
+  company: string;
+  description: string;
+  icon: 'briefcase' | 'code' | 'calendar' | 'graduation';
+}
+
 const About = () => {
-  // Tech stack items
-  const techStack = [
+  // State for bio, tech stack, and timeline items
+  const [bio, setBio] = useState<string>(
+    "I'm a passionate AI/ML Developer and Freelance Project Consultant with expertise in building innovative solutions for complex problems. With over 5 years of experience in machine learning, computer vision, and natural language processing, I specialize in turning data into actionable insights and intelligent applications.\n\nAs the founder of NeuroSpark, I work with clients ranging from startups to enterprises, helping them leverage artificial intelligence to gain competitive advantages. My approach combines technical expertise with a deep understanding of business needs to create scalable, effective solutions."
+  );
+  
+  const [techStack, setTechStack] = useState<TechItem[]>([
     { name: 'Python', icon: '🐍' },
     { name: 'TensorFlow', icon: '🧠' },
     { name: 'PyTorch', icon: '🔥' },
@@ -14,39 +33,106 @@ const About = () => {
     { name: 'Docker', icon: '🐳' },
     { name: 'AWS', icon: '☁️' },
     { name: 'MongoDB', icon: '🍃' },
-  ];
-
-  // Timeline items
-  const timelineItems = [
+  ]);
+  
+  const [timelineItems, setTimelineItems] = useState<TimelineItem[]>([
     {
+      id: 1,
       year: '2023 - Present',
       title: 'Founder & AI Consultant',
       company: 'NeuroSpark',
       description: 'Leading AI consulting firm specializing in computer vision and natural language processing solutions.',
-      icon: <Briefcase className="h-5 w-5" />,
+      icon: 'briefcase',
     },
     {
+      id: 2,
       year: '2021 - 2023',
       title: 'Senior Machine Learning Engineer',
       company: 'Tech Innovators Inc.',
       description: 'Led multiple AI initiatives, developed predictive models, and implemented computer vision solutions.',
-      icon: <Code className="h-5 w-5" />,
+      icon: 'code',
     },
     {
+      id: 3,
       year: '2019 - 2021',
       title: 'Data Scientist',
       company: 'DataWave Analytics',
       description: 'Built machine learning models for predictive analytics and natural language processing applications.',
-      icon: <Calendar className="h-5 w-5" />,
+      icon: 'calendar',
     },
     {
+      id: 4,
       year: '2018',
       title: 'MSc in Artificial Intelligence',
       company: 'Tech University',
       description: 'Graduate studies focused on deep learning, computer vision, and reinforcement learning.',
-      icon: <GraduationCap className="h-5 w-5" />,
+      icon: 'graduation',
     },
-  ];
+  ]);
+  
+  // Resume state
+  const [resumeName, setResumeName] = useState<string | null>(null);
+  const [resumeLastUpdated, setResumeLastUpdated] = useState<string | null>(null);
+
+  // Load data from localStorage on component mount
+  useEffect(() => {
+    // Load bio
+    const savedBio = localStorage.getItem('aboutBio');
+    if (savedBio) {
+      setBio(savedBio);
+    }
+    
+    // Load tech stack
+    const savedTechStack = localStorage.getItem('aboutTechStack');
+    if (savedTechStack) {
+      setTechStack(JSON.parse(savedTechStack));
+    }
+    
+    // Load timeline items
+    const savedTimelineItems = localStorage.getItem('experienceItems');
+    if (savedTimelineItems) {
+      setTimelineItems(JSON.parse(savedTimelineItems));
+    }
+    
+    // Load resume info
+    const savedResumeName = localStorage.getItem('resumeName');
+    if (savedResumeName) {
+      setResumeName(savedResumeName);
+      const lastUpdated = localStorage.getItem('resumeLastUpdated');
+      if (lastUpdated) {
+        setResumeLastUpdated(lastUpdated);
+      }
+    }
+  }, []);
+  
+  // Render icon based on type for timeline items
+  const renderIcon = (iconType: string) => {
+    switch (iconType) {
+      case 'briefcase':
+        return <Briefcase className="h-5 w-5" />;
+      case 'code':
+        return <Code className="h-5 w-5" />;
+      case 'calendar':
+        return <Calendar className="h-5 w-5" />;
+      case 'graduation':
+        return <GraduationCap className="h-5 w-5" />;
+      default:
+        return <Briefcase className="h-5 w-5" />;
+    }
+  };
+  
+  const handleDownloadResume = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // Check if resume exists
+    if (!resumeName) {
+      e.preventDefault();
+      console.log('No resume available for download');
+      // You could add a toast notification here in a real app
+      return;
+    }
+    
+    console.log('Downloading resume:', resumeName);
+    // In a real app with backend storage, this would be a real download link
+  };
 
   return (
     <section id="about" className="section-container">
@@ -59,29 +145,23 @@ const About = () => {
           
           <div className="prose prose-lg prose-invert max-w-none">
             <p className="text-white/80 mb-6">
-              I'm a passionate AI/ML Developer and Freelance Project Consultant with expertise in building innovative solutions 
-              for complex problems. With over 5 years of experience in machine learning, computer vision, and natural language processing,
-              I specialize in turning data into actionable insights and intelligent applications.
+              {bio.split('\n\n')[0]}
             </p>
             
-            <p className="text-white/80 mb-8">
-              As the founder of NeuroSpark, I work with clients ranging from startups to enterprises, 
-              helping them leverage artificial intelligence to gain competitive advantages. My approach combines 
-              technical expertise with a deep understanding of business needs to create scalable, effective solutions.
-            </p>
+            {bio.split('\n\n')[1] && (
+              <p className="text-white/80 mb-8">
+                {bio.split('\n\n')[1]}
+              </p>
+            )}
             
             <div className="flex items-center mb-8">
               <a 
                 href="#" 
-                className="btn-primary flex items-center gap-2 group"
-                onClick={(e) => {
-                  e.preventDefault();
-                  // Here you would typically fetch and download the resume
-                  console.log('Downloading resume...');
-                }}
+                className={`btn-primary flex items-center gap-2 group ${!resumeName ? 'opacity-50 cursor-not-allowed' : ''}`}
+                onClick={handleDownloadResume}
               >
                 <Download className="h-5 w-5 transition-transform group-hover:-translate-y-1" />
-                Download Resume
+                {resumeName ? 'Download Resume' : 'Resume Not Available'}
               </a>
             </div>
           </div>
@@ -110,12 +190,12 @@ const About = () => {
           <div className="relative border-l border-neurospark-purple/30 pl-6 ml-3">
             {timelineItems.map((item, index) => (
               <div 
-                key={index} 
+                key={item.id} 
                 className={`mb-10 relative ${index === 0 ? 'animate-fade-in' : ''}`}
                 style={{animationDelay: `${index * 150}ms`}}
               >
                 <div className="absolute -left-[31px] bg-neurospark-dark p-1 border-2 border-neurospark-purple rounded-full">
-                  {item.icon}
+                  {renderIcon(item.icon)}
                 </div>
                 
                 <span className="text-sm text-neurospark-purple-light mb-1 block">

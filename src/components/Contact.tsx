@@ -1,5 +1,16 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Mail, MapPin, Phone, Linkedin, Github, Twitter } from 'lucide-react';
+
+interface ContactInfo {
+  email: string;
+  phone: string;
+  location: string;
+  linkedin: string;
+  github: string;
+  twitter: string;
+}
+
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -7,6 +18,23 @@ const Contact = () => {
     message: ''
   });
   const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [contactInfo, setContactInfo] = useState<ContactInfo>({
+    email: 'gunayow@gmail.com',
+    phone: '+91 9597569821',
+    location: 'Pondicherry, IN',
+    linkedin: 'https://linkedin.com',
+    github: 'https://github.com',
+    twitter: 'https://twitter.com'
+  });
+  
+  // Load contact info from localStorage
+  useEffect(() => {
+    const savedContactInfo = localStorage.getItem('contactInfo');
+    if (savedContactInfo) {
+      setContactInfo(JSON.parse(savedContactInfo));
+    }
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const {
       name,
@@ -17,6 +45,7 @@ const Contact = () => {
       [name]: value
     }));
   };
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormStatus('submitting');
@@ -36,6 +65,7 @@ const Contact = () => {
       }, 3000);
     }, 1500);
   };
+  
   return <section id="contact" className="section-container">
       <h2 className="section-title text-center">
         Get In <span className="gradient-text">Touch</span>
@@ -57,7 +87,9 @@ const Contact = () => {
               </div>
               <div>
                 <h3 className="font-medium mb-1">Email</h3>
-                <a href="mailto:[yourname]@gmail.com" className="text-white/70 hover:text-white transition-colors">gunayow@gmail.com</a>
+                <a href={`mailto:${contactInfo.email}`} className="text-white/70 hover:text-white transition-colors">
+                  {contactInfo.email}
+                </a>
               </div>
             </div>
             
@@ -67,7 +99,7 @@ const Contact = () => {
               </div>
               <div>
                 <h3 className="font-medium mb-1">Location</h3>
-                <p className="text-white/70">Pondicherry, IN</p>
+                <p className="text-white/70">{contactInfo.location}</p>
               </div>
             </div>
             
@@ -77,7 +109,9 @@ const Contact = () => {
               </div>
               <div>
                 <h3 className="font-medium mb-1">Phone</h3>
-                <a href="tel:+1234567890" className="text-white/70 hover:text-white transition-colors">+91 9597569821</a>
+                <a href={`tel:${contactInfo.phone}`} className="text-white/70 hover:text-white transition-colors">
+                  {contactInfo.phone}
+                </a>
               </div>
             </div>
           </div>
@@ -86,13 +120,13 @@ const Contact = () => {
           <div>
             <h3 className="text-lg font-medium mb-4">Connect</h3>
             <div className="flex gap-4">
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="p-3 glass-card rounded-full hover:bg-neurospark-purple/20 transition-colors" aria-label="LinkedIn Profile">
+              <a href={contactInfo.linkedin} target="_blank" rel="noopener noreferrer" className="p-3 glass-card rounded-full hover:bg-neurospark-purple/20 transition-colors" aria-label="LinkedIn Profile">
                 <Linkedin className="h-5 w-5" />
               </a>
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="p-3 glass-card rounded-full hover:bg-neurospark-purple/20 transition-colors" aria-label="GitHub Profile">
+              <a href={contactInfo.github} target="_blank" rel="noopener noreferrer" className="p-3 glass-card rounded-full hover:bg-neurospark-purple/20 transition-colors" aria-label="GitHub Profile">
                 <Github className="h-5 w-5" />
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="p-3 glass-card rounded-full hover:bg-neurospark-purple/20 transition-colors" aria-label="Twitter Profile">
+              <a href={contactInfo.twitter} target="_blank" rel="noopener noreferrer" className="p-3 glass-card rounded-full hover:bg-neurospark-purple/20 transition-colors" aria-label="Twitter Profile">
                 <Twitter className="h-5 w-5" />
               </a>
             </div>

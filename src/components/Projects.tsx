@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProjectCard from './ProjectCard';
 import { X } from 'lucide-react';
 
@@ -20,9 +19,7 @@ interface Project {
 const Projects = () => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-
-  // Sample projects data
-  const projects: Project[] = [
+  const [projects, setProjects] = useState<Project[]>([
     {
       id: 1,
       title: "AI Visual Recognition System",
@@ -73,7 +70,15 @@ const Projects = () => {
       problem: "Commercial buildings waste significant energy through inefficient HVAC and lighting operations that don't adapt to changing conditions or occupancy patterns.",
       solution: "Created a reinforcement learning system that continuously optimizes HVAC and lighting settings based on occupancy, external weather, and historical patterns, resulting in 23% energy savings."
     },
-  ];
+  ]);
+
+  // Load projects from localStorage on component mount
+  useEffect(() => {
+    const savedProjects = localStorage.getItem('projects');
+    if (savedProjects) {
+      setProjects(JSON.parse(savedProjects));
+    }
+  }, []);
 
   const openProjectModal = (project: Project) => {
     setSelectedProject(project);
